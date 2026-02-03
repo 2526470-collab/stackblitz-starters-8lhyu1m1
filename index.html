@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OC 背景故事生成器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+      body {
+        font-family: 'Noto Sans TC', sans-serif;
+      }
+      .result-card {
+        transition: all 0.3s ease;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 min-h-screen flex flex-col items-center py-12 px-4">
+    <div
+      class="max-w-2xl w-full bg-white rounded-2xl shadow-xl overflow-hidden"
+    >
+      <div class="bg-indigo-600 p-6 text-white text-center">
+        <h1 class="text-3xl font-bold tracking-tight">OC 背景生成器</h1>
+        <p class="mt-2 opacity-80">為你的原創角色注入靈魂與故事</p>
+      </div>
+
+      <div class="p-8">
+        <div id="display-area" class="hidden">
+          <div
+            class="result-card bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-lg mb-8"
+          >
+            <h2 class="text-indigo-900 font-bold mb-4 flex items-center">
+              <span class="mr-2">📜</span> 生成結果：
+            </h2>
+            <p id="story-text" class="text-slate-700 leading-loose text-lg"></p>
+          </div>
+        </div>
+
+        <div id="placeholder" class="text-center py-12 text-slate-400">
+          <p>點擊下方按鈕，隨機生成一個背景設定</p>
+        </div>
+
+        <button
+          onclick="generateStory()"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition duration-200 transform hover:-translate-y-1 active:scale-95"
+        >
+          ✨ 隨機生成背景
+        </button>
+      </div>
+
+      <div class="px-8 pb-8">
+        <div class="grid grid-cols-2 gap-4 text-sm text-slate-500">
+          <div class="bg-slate-100 p-3 rounded">💡 包含：出生背景</div>
+          <div class="bg-slate-100 p-3 rounded">🔑 包含：核心動機</div>
+          <div class="bg-slate-100 p-3 rounded">⚔️ 包含：重大的轉折</div>
+          <div class="bg-slate-100 p-3 rounded">🌟 包含：目前的處境</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const data = {
+        origin: [
+          '出生在一個被遺忘的邊境小鎮，',
+          '曾是沒落貴族家的唯一後裔，',
+          '在喧鬧的地下都市貧民窟長大，',
+          '原本是隸屬於神秘組織的實驗體，',
+          '生長於深山的守護者一族，',
+          '是在圖書館廢墟中被機器人撫養長大的孩子，',
+        ],
+        turningPoint: [
+          '但在一次意外的森林大火中失去了一切，',
+          '卻因為發現了家族隱藏的禁忌秘密而被驅逐，',
+          '直到那名戴著面具的陌生人給了其一份契約，',
+          '某天突然覺醒了連自己都無法掌控的力量，',
+          '為了尋找失蹤多年的親人而踏上旅程，',
+          '因被最好的朋友背叛而落入絕境，',
+        ],
+        motivation: [
+          '現在隱姓埋名，秘密地尋找復仇的機會。',
+          '此後決定成為一名遊走於灰色地帶的情報販子。',
+          '目前正帶著那件詛咒的遺物，尋找解除的方法。',
+          '決心變強，直到能夠守護身邊僅剩的人事物。',
+          '雖然失去了記憶，但本能地朝著地圖上的紅點前行。',
+          '在世界各地旅行，只為證明那個傳說並非虛構。',
+        ],
+      };
+
+      function generateStory() {
+        const displayArea = document.getElementById('display-area');
+        const placeholder = document.getElementById('placeholder');
+        const storyText = document.getElementById('story-text');
+
+        const o = data.origin[Math.floor(Math.random() * data.origin.length)];
+        const t =
+          data.turningPoint[
+            Math.floor(Math.random() * data.turningPoint.length)
+          ];
+        const m =
+          data.motivation[Math.floor(Math.random() * data.motivation.length)];
+
+        // Animation effect
+        storyText.style.opacity = 0;
+
+        setTimeout(() => {
+          storyText.innerText = o + t + m;
+          storyText.style.opacity = 1;
+          displayArea.classList.remove('hidden');
+          placeholder.classList.add('hidden');
+        }, 100);
+      }
+    </script>
+  </body>
+</html>
