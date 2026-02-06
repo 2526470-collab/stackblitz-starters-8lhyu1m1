@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC 靈魂編織者 Pro</title>
+    <title>OC 靈魂編織者 - 完整版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -18,7 +18,6 @@
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.4s ease;
         }
         .accent-gradient {
             background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
@@ -40,7 +39,7 @@
         <div class="glass-card rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-30"></div>
             <span class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">背景故事 / Background</span>
-            <p id="out-story" class="text-3xl mt-6 leading-relaxed italic text-slate-100 font-light fade-up">載入中...</p>
+            <p id="out-story" class="text-2xl mt-6 leading-relaxed italic text-slate-100 font-light fade-up">點擊下方按鈕開始編織...</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -54,17 +53,17 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center pt-8 border-t border-white/5">
+        <div class="glass-card rounded-[2.5rem] p-8 grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
             <div class="lg:col-span-2 flex flex-col items-center">
-                <div class="w-full max-w-[280px] aspect-square relative">
+                <div class="w-full max-w-[280px] aspect-square">
                     <canvas id="abilityChart"></canvas>
                 </div>
-                <p class="mt-4 text-[10px] text-slate-500 uppercase tracking-widest font-bold">能力分布圖</p>
+                <p class="mt-4 text-[10px] text-slate-500 uppercase tracking-widest font-bold">能力分布圖 (15-95)</p>
             </div>
             
             <div class="lg:col-span-3 space-y-4">
-                <button onclick="generate()" class="w-full py-6 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-2xl shadow-xl shadow-indigo-500/20 transition-all active:scale-95 group">
-                    <span class="group-hover:tracking-widest transition-all">✨ 重新編織靈魂</span>
+                <button onclick="generate()" class="w-full py-6 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-2xl shadow-xl shadow-indigo-500/20 transition-all active:scale-95">
+                    ✨ 重新編織靈魂
                 </button>
                 <button onclick="copyAll()" class="w-full py-3 text-slate-500 hover:text-slate-300 text-xs tracking-widest uppercase transition">
                     📋 複製完整設定
@@ -75,13 +74,13 @@
 
     <script>
         const library = {
-            id: ["退役的星際傭兵", "仿生少女", "被驅逐的占星師", "深海倖存者", "讀心調酒師", "古文獻翻譯員", "時空信差", "龍裔領主", "賽博黑客", "古董商人", "流浪軍醫", "機械守護者"],
-            loc: ["在垃圾城", "在發光洞穴", "在霓虹街區", "在神殿廢墟", "在移動監獄", "在雲端行政區", "在時間靜止的圖書館"],
-            evt: ["發現系統後門", "被抹除存在證明", "拾獲對話硬幣", "成為神明載體", "覺醒重力天賦", "目睹禁忌實驗", "解開萬年禁咒"],
-            res: ["決定隱姓埋名。", "計畫壯烈復仇。", "發誓找回身分。", "成為都市傳說。", "尋找消失極光。", "正修補世界線。"],
-            out: ["表面優雅禮貌", "看起來脾氣暴躁", "帶著神祕微笑", "說話語速極快", "行為舉止僵硬", "顯得漫不經心"],
-            inn: ["內心卻極度自卑", "靈魂嚮往自由", "熱愛小動物", "潛藏瘋狂念頭", "對人性徹底失望", "其實極度理性"],
-            det: ["帶著壞掉的手錶。", "攜帶泛黃的照片。", "口袋裝滿玻璃珠。", "耳後有條碼刺青。", "堅持每天寫日記。", "隨身帶著乾枯的玫瑰。"]
+            id: ["失憶的星際傭兵", "仿生少女", "被驅逐的占星師", "深海倖存者", "讀心調酒師", "最後的古文獻翻譯員", "時空信差", "龍裔領主", "賽博黑客", "古董商人", "流浪軍醫", "機械守護者", "沒落的破產貴族", "失去魔力的法師"],
+            loc: ["在垃圾城", "在發光洞穴", "在霓虹街區", "在神殿廢墟", "在移動監獄", "在雲端行政區", "在時間靜止的圖書館", "在療養院"],
+            evt: ["發現系統後門", "被抹除存在證明", "拾獲對話硬幣", "成為神明載體", "覺醒重力天賦", "目睹禁忌實驗", "解開萬年禁咒", "染上了不明惡疾"],
+            res: ["決定隱姓埋名。", "計畫壯烈復仇。", "發誓找回身分。", "成為都市傳說。", "尋找消失極光。", "正修補世界線。", "正無助地等待救贖。"],
+            out: ["表面優雅禮貌", "看起來脾氣暴躁", "帶著神祕微笑", "說話語速極快", "行為舉止僵硬", "顯得漫不經心", "畏畏縮縮"],
+            inn: ["內心卻極度自卑", "靈魂嚮往自由", "熱愛小動物", "潛藏瘋狂念頭", "對人性徹底失望", "其實極度理性", "充滿了負罪感"],
+            det: ["帶著壞掉的手錶。", "攜帶泛黃的照片。", "口袋裝滿玻璃珠。", "耳後有條碼刺青。", "堅持每天寫日記。", "隨身帶著乾枯的玫瑰。", "天生肢體不協調。"]
         };
 
         let pools = {};
@@ -103,15 +102,7 @@
                     }]
                 },
                 options: {
-                    scales: {
-                        r: {
-                            min: 0, max: 100,
-                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                            pointLabels: { color: 'rgba(255, 255, 255, 0.4)', font: { size: 11 } },
-                            ticks: { display: false }
-                        }
-                    },
+                    scales: { r: { min: 0, max: 100, grid: { color: 'rgba(255, 255, 255, 0.05)' }, angleLines: { color: 'rgba(255, 255, 255, 0.1)' }, pointLabels: { color: 'rgba(255, 255, 255, 0.4)', font: { size: 11 } }, ticks: { display: false } } },
                     plugins: { legend: { display: false } }
                 }
             });
@@ -134,11 +125,10 @@
             document.getElementById('out-trait').innerText = trait;
             document.getElementById('out-detail').innerText = detail;
 
-            // 數值
-            myChart.data.datasets[0].data = Array.from({length: 6}, () => Math.floor(Math.random() * 60) + 40);
+            // 隨機數值 (15-95)，允許角色很弱
+            myChart.data.datasets[0].data = Array.from({length: 6}, () => Math.floor(Math.random() * 80) + 15);
             myChart.update();
 
-            // 重啟動畫
             storyEl.classList.remove('fade-up');
             void storyEl.offsetWidth; 
             storyEl.classList.add('fade-up');
@@ -150,10 +140,7 @@
             alert("已複製到剪貼簿！");
         }
 
-        window.onload = () => {
-            initChart();
-            generate();
-        };
+        window.onload = () => { initChart(); generate(); };
     </script>
 </body>
 </html>
