@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC 靈魂編織者 - 完整版</title>
+    <title>OC 靈魂編織者 - 跨時空版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700;900&display=swap');
         body { 
             font-family: 'Noto Sans TC', sans-serif; 
-            background: radial-gradient(circle at center, #1e1b4b 0%, #020617 100%);
+            background: radial-gradient(circle at center, #1a1a2e 0%, #050505 100%);
             color: #f8fafc;
             min-height: 100vh;
         }
         .glass-card {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(20, 20, 25, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .accent-gradient {
-            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            background: linear-gradient(135deg, #fb7185 0%, #a855f7 50%, #6366f1 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -33,22 +33,22 @@
     <div class="max-w-4xl mx-auto space-y-8">
         <header class="text-center">
             <h1 class="text-5xl font-black mb-2 accent-gradient tracking-tighter">OC 角色設定庫</h1>
-            <p class="text-slate-500 font-light tracking-[0.2em] text-xs uppercase">Procedural Attribute Mapping</p>
+            <p class="text-slate-500 font-light tracking-[0.2em] text-xs uppercase">Magical / Cultivator / Survivor Expansion</p>
         </header>
 
         <div class="glass-card rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-30"></div>
-            <span class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">背景故事 / Background</span>
-            <p id="out-story" class="text-2xl mt-6 leading-relaxed italic text-slate-100 font-light fade-up">點擊下方按鈕開始編織...</p>
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500 opacity-40"></div>
+            <span class="text-[10px] text-slate-500 font-bold tracking-widest uppercase italic">角色核心檔案 / Core Profile</span>
+            <p id="out-story" class="text-2xl mt-6 leading-relaxed italic text-slate-100 font-light fade-up">按下抽取，召喚靈魂...</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="glass-card rounded-[2rem] p-8">
-                <span class="text-[10px] text-emerald-400/70 font-bold uppercase tracking-widest">性格 / Personality</span>
+            <div class="glass-card rounded-[2rem] p-8 border-t border-purple-500/20">
+                <span class="text-[10px] text-purple-400 font-bold uppercase tracking-widest">性格特徵 / Personality</span>
                 <p id="out-trait" class="mt-4 text-slate-300 text-lg leading-relaxed">-</p>
             </div>
-            <div class="glass-card rounded-[2rem] p-8">
-                <span class="text-[10px] text-amber-400/70 font-bold uppercase tracking-widest">特徵 / Details</span>
+            <div class="glass-card rounded-[2rem] p-8 border-t border-rose-500/20">
+                <span class="text-[10px] text-rose-400 font-bold uppercase tracking-widest">特殊印記 / Unique Detail</span>
                 <p id="out-detail" class="mt-4 text-slate-300 text-lg leading-relaxed">-</p>
             </div>
         </div>
@@ -58,29 +58,56 @@
                 <div class="w-full max-w-[280px] aspect-square">
                     <canvas id="abilityChart"></canvas>
                 </div>
-                <p class="mt-4 text-[10px] text-slate-500 uppercase tracking-widest font-bold">能力分布圖 (15-95)</p>
             </div>
             
             <div class="lg:col-span-3 space-y-4">
-                <button onclick="generate()" class="w-full py-6 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-2xl shadow-xl shadow-indigo-500/20 transition-all active:scale-95">
+                <button onclick="generate()" class="w-full py-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-2xl shadow-xl shadow-purple-500/20 transition-all active:scale-95">
                     ✨ 重新編織靈魂
                 </button>
-                <button onclick="copyAll()" class="w-full py-3 text-slate-500 hover:text-slate-300 text-xs tracking-widest uppercase transition">
-                    📋 複製完整設定
-                </button>
+                <div class="flex gap-4">
+                    <button onclick="copyAll()" class="flex-1 py-3 glass-card rounded-xl text-slate-400 hover:text-white text-xs tracking-widest uppercase transition">
+                        📋 複製設定
+                    </button>
+                    <div id="pool-count" class="text-[10px] text-slate-600 flex items-center px-2">零件充足</div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const library = {
-            id: ["失憶的星際傭兵", "仿生少女", "被驅逐的占星師", "深海倖存者", "讀心調酒師", "最後的古文獻翻譯員", "時空信差", "龍裔領主", "賽博黑客", "古董商人", "流浪軍醫", "機械守護者", "沒落的破產貴族", "失去魔力的法師"],
-            loc: ["在垃圾城", "在發光洞穴", "在霓虹街區", "在神殿廢墟", "在移動監獄", "在雲端行政區", "在時間靜止的圖書館", "在療養院"],
-            evt: ["發現系統後門", "被抹除存在證明", "拾獲對話硬幣", "成為神明載體", "覺醒重力天賦", "目睹禁忌實驗", "解開萬年禁咒", "染上了不明惡疾"],
-            res: ["決定隱姓埋名。", "計畫壯烈復仇。", "發誓找回身分。", "成為都市傳說。", "尋找消失極光。", "正修補世界線。", "正無助地等待救贖。"],
-            out: ["表面優雅禮貌", "看起來脾氣暴躁", "帶著神祕微笑", "說話語速極快", "行為舉止僵硬", "顯得漫不經心", "畏畏縮縮"],
-            inn: ["內心卻極度自卑", "靈魂嚮往自由", "熱愛小動物", "潛藏瘋狂念頭", "對人性徹底失望", "其實極度理性", "充滿了負罪感"],
-            det: ["帶著壞掉的手錶。", "攜帶泛黃的照片。", "口袋裝滿玻璃珠。", "耳後有條碼刺青。", "堅持每天寫日記。", "隨身帶著乾枯的玫瑰。", "天生肢體不協調。"]
+            id: [
+                // 魔法少女類
+                "簽下錯誤契約的魔法少女", "被噩夢侵蝕的魔法使", "失去變身道具的見習少女", "隱藏在校園中的魔女獵人",
+                // 修仙類
+                "丹田破碎的廢柴少主", "修煉禁忌功法的魔道散修", "天生劍體的落魄劍修", "守護藥園的靈獸化身",
+                // 末日類
+                "廢土中的避難所遺孤", "擁有預知能力的拾荒者", "受感染但仍保持理智的變異者", "末日廣播站的唯一播報員",
+                // 原有類
+                "失憶的星際傭兵", "仿生機器人", "被逐出的占星師", "讀心調酒師", "最後的古文獻翻譯員"
+            ],
+            loc: [
+                "在被詛咒的糖果工廠", "在雷雲密佈的渡劫台", "在滿是異種的斷裂大橋下", "在星光凋零的魔法陣中心",
+                "在充滿靈氣卻致命的禁地", "在霓虹覆蓋的罪惡街區", "在時間靜止的圖書館", "在廢棄的核電廠核心"
+            ],
+            evt: [
+                "發現了變身後會消耗壽命的真相", "強行衝擊境界導致神魂受損", "意外開啟了通往平行宇宙的信箱",
+                "目睹了魔法契約背後的巨大謊言", "在輻射塵中找到了一朵活著的花", "在遺蹟中拾獲了仙帝的殘破日記",
+                "被最信任的契約獸出賣了身分", "破解了古老文明留下的自毀代碼"
+            ],
+            res: [
+                "決定燃燒最後的靈魂光芒。", "誓言要逆天改命重新開始。", "正隱瞞傷勢獨自對抗荒原生物。",
+                "成為了黑暗中默默前行的守護者。", "正等待著下一個能契約的靈魂。", "在廢墟中建立了微小的秩序。"
+            ],
+            out: [
+                "雖然看起來天真爛漫", "平時表現得極度自負", "神情透著一種死寂般的冷靜", "舉止充滿了仙風道骨的韻味",
+                "行為處事極端現實且冷酷", "說話總帶著神祕的術語", "看起來總是傷痕累累"
+            ],
+            inn: ["內心卻極度渴望平凡的生活", "靈魂早已被黑暗魔力侵蝕", "其實對正義感到無比疲憊", "潛意識中極度害怕孤獨", "對這個崩壞的世界仍抱有溫柔", "實則隱藏著不可告人的慈悲"],
+            det: [
+                "手腕上繫著斷掉的變身帶。", "左眼瞳孔中隱約有雷光閃動。", "隨身攜帶一根生鏽的撬棍。", "耳後刻著無法抹去的實驗編號。",
+                "口袋裡裝著一顆早已乾枯的靈石。", "腰間掛著一個碎裂的陶瓷玩偶。", "總是聞到一股燃燒的香灰味。", "身上披著一件不合身的染血校服。"
+            ]
         };
 
         let pools = {};
@@ -91,13 +118,13 @@
             myChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: ['力量', '敏捷', '智力', '體質', '意志', '幸運'],
+                    labels: ['戰鬥', '生存', '悟性', '魔力', '意志', '幸運'],
                     datasets: [{
                         data: [0, 0, 0, 0, 0, 0],
                         fill: true,
-                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
-                        borderColor: 'rgb(129, 140, 248)',
-                        pointBackgroundColor: 'rgb(129, 140, 248)',
+                        backgroundColor: 'rgba(168, 85, 247, 0.2)',
+                        borderColor: 'rgb(168, 85, 247)',
+                        pointBackgroundColor: 'rgb(251, 113, 133)',
                         borderWidth: 2
                     }]
                 },
@@ -125,8 +152,8 @@
             document.getElementById('out-trait').innerText = trait;
             document.getElementById('out-detail').innerText = detail;
 
-            // 隨機數值 (15-95)，允許角色很弱
-            myChart.data.datasets[0].data = Array.from({length: 6}, () => Math.floor(Math.random() * 80) + 15);
+            // 隨機數值 (10-100)，支持弱角色與強者
+            myChart.data.datasets[0].data = Array.from({length: 6}, () => Math.floor(Math.random() * 90) + 10);
             myChart.update();
 
             storyEl.classList.remove('fade-up');
@@ -135,7 +162,7 @@
         }
 
         function copyAll() {
-            const text = `【OC 設定匯出】\n背景：${document.getElementById('out-story').innerText}\n性格：${document.getElementById('out-trait').innerText}\n細節：${document.getElementById('out-detail').innerText}`;
+            const text = `【OC 設定匯出】\n背景：${document.getElementById('out-story').innerText}\n性格：${document.getElementById('out-trait').innerText}\n特徵：${document.getElementById('out-detail').innerText}`;
             navigator.clipboard.writeText(text);
             alert("已複製到剪貼簿！");
         }
