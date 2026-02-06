@@ -3,131 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC 背景 & 性格生成器</title>
+    <title>OC 靈魂編織者</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; background: #0f172a; color: #f1f5f9; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .output-box { min-height: 120px; transition: all 0.3s ease; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700;900&display=swap');
+        
+        body { 
+            font-family: 'Noto Sans TC', sans-serif; 
+            background: radial-gradient(circle at center, #1e1b4b 0%, #020617 100%);
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .accent-gradient {
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glow-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .glow-btn:hover {
+            box-shadow: 0 0 35px rgba(168, 85, 247, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .glow-btn:active { transform: scale(0.95); }
+
+        .type-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* 內容出現動畫 */
+        .fade-up {
+            animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
     </style>
 </head>
-<body class="min-h-screen py-10 px-4 flex flex-col items-center">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-2xl w-full">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 mb-2">
-                OC 設定生成器
-            </h1>
-            <p class="text-slate-400">創造獨一無二的人物靈魂</p>
+    <div class="fixed top-0 left-0 w-full h-full pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-900/20 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-900/20 blur-[120px] rounded-full"></div>
+    </div>
+
+    <div class="max-w-4xl w-full z-10">
+        <header class="text-center mb-12">
+            <h1 class="text-5xl font-black mb-4 accent-gradient tracking-tighter">OC 背景生成器</h1>
+            <p class="text-slate-400 font-light tracking-[0.3em] text-sm">ORIGINAL CHARACTER GENERATOR</p>
         </header>
 
-        <div class="space-y-4">
-            <div class="glass rounded-2xl p-6 shadow-xl">
-                <h3 class="text-blue-400 text-sm font-bold mb-2 flex items-center">
-                    <span class="mr-2">📖</span> 背景故事
-                </h3>
-                <div id="story-output" class="output-box flex items-center text-lg leading-relaxed italic text-slate-200">
-                    等待召喚背景...
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-1 space-y-6">
+                <div class="glass-card rounded-3xl p-6">
+                    <h3 class="text-xs font-bold text-slate-500 mb-4 tracking-widest uppercase">系統狀態</h3>
+                    <div class="space-y-4" id="stats-panel">
+                        </div>
+                </div>
+
+                <button onclick="generate()" class="glow-btn w-full py-6 rounded-2xl text-white font-bold text-xl flex items-center justify-center gap-3 group">
+                    <span>✨ 抽取靈魂</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="lg:col-span-2 space-y-6">
+                <div class="glass-card rounded-[2rem] p-10 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
+                    <span class="type-label">背景故事 / Background</span>
+                    <p id="out-story" class="text-2xl mt-6 leading-relaxed text-slate-100 font-light italic">
+                        點擊左側按鈕開始生成...
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-card rounded-[2rem] p-8">
+                        <span class="type-label text-emerald-400/60">性格特質 / Personality</span>
+                        <p id="out-trait" class="mt-4 text-slate-300 leading-relaxed">-</p>
+                    </div>
+                    <div class="glass-card rounded-[2rem] p-8">
+                        <span class="type-label text-amber-400/60">獨特細節 / Quirks</span>
+                        <p id="out-detail" class="mt-4 text-slate-300 leading-relaxed">-</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="glass rounded-2xl p-6 shadow-xl">
-                <h3 class="text-purple-400 text-sm font-bold mb-2 flex items-center">
-                    <span class="mr-2">🎭</span> 性格特質
-                </h3>
-                <div id="trait-output" class="output-box flex items-center text-lg leading-relaxed font-medium text-slate-200">
-                    等待解析性格...
-                </div>
-            </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
-            <button onclick="generateStory()" class="bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold shadow-lg shadow-blue-900/30 transition-all active:scale-95">
-                ✨ 生成背景
+        <footer class="mt-12 text-center">
+            <button onclick="copyAll()" class="text-slate-500 hover:text-indigo-400 transition text-xs border-b border-transparent hover:border-indigo-400 pb-1">
+                COPY SETTINGS TO CLIPBOARD
             </button>
-            <button onclick="generateTrait()" class="bg-purple-600 hover:bg-purple-500 py-4 rounded-xl font-bold shadow-lg shadow-purple-900/30 transition-all active:scale-95">
-                💎 生成性格
-            </button>
-        </div>
-
-        <div class="mt-10 text-center text-xs text-slate-500 space-y-1">
-            <p>已生成組合：<span id="history-count" class="text-slate-300">0</span></p>
-            <p>※ 系統會自動過濾重複內容，確保靈感不枯竭</p>
         </div>
     </div>
 
     <script>
-        const data = {
-            // 背景零件
-            identity: ["一名軍醫", "一位廢土拾荒者", "退役的聖騎士", "皇室的私生子", "叛逃的AI原型", "街頭的神祕占卜師", "被放逐的龍族血脈"],
-            location: ["在浮空監獄裡", "在古老的機械迷宮中", "在永恆的黑夜森林", "在沉沒的古城遺址", "在繁華卻腐敗的首都", "在邊境的無人區"],
-            event: ["目睹了禁忌的禁咒運作", "意外獲得了操控時間的能力", "發現了自己其實是個複製品", "被家族作為政治交易犧牲", "在絕境中聽見了古神的低語"],
-            result: ["從此不再信任任何人。", "正秘密組織著反抗力量。", "決定踏上贖罪的漫長旅程。", "發誓要奪回失去的王位。", "目前以此作為力量的源泉。"],
-            
-            // 性格零件
-            traits: [
-                "表面冷酷無情，其實對小動物毫無抵抗力。",
-                "極度理性，認為情感是干擾判斷的雜訊。",
-                "總是帶著溫柔的微笑，眼神卻沒有絲毫溫度。",
-                "重度強迫症，必須確保計畫完美無缺才行動。",
-                "說話充滿諷刺，但會在關鍵時刻捨身救人。",
-                "充滿好奇心，即使面對危險也想探究真相。",
-                "極其自卑，因此總是表現得過度狂妄自大。",
-                "雖然健忘，但對於承諾過的事絕對會完成。"
-            ]
+        const library = {
+            id: ["一名失憶的星際老兵", "廢棄工廠的仿生少女", "被驅逐的宮廷占星師", "深海探險隊的倖存者", "擁有讀心能力的調酒師", "最後的古文獻翻譯員", "穿梭時空的信差", "地下競技場的常勝軍", "沒落皇室的私生子", "非法改造的偵探", "在圖書館長大的孤兒", "非法基因實驗的逃亡者", "一名行蹤成謎的僧侶", "古老機械的守護員", "街頭的賽博黑客", "神祕的古董商人", "受詛咒的流浪騎士", "在霓虹燈下起舞的殺手", "星際植物學家", "幻影歌劇院的樂師", "一名流浪的舊時代軍醫", "被遺忘在月球的工程師"],
+            loc: ["在漂浮的垃圾城", "在發光植物的洞穴", "在霓虹覆蓋的罪惡街區", "在被遺忘的神殿廢墟", "在極地的移動監獄", "在充滿魔力的圖書館", "在永恆黃昏的荒漠", "在雲端的行政區", "在海底的私人試驗站", "在齒輪運轉的地下城", "在廢棄的宇宙廣播站", "在滿是鐵鏽的工業區", "在時間靜止的鐘樓"],
+            evt: ["意外發現了世界的系統後門", "被最親近的人抹除了存在證明", "拾獲了能與過去對話的硬幣", "被迫成為神明降臨的載體", "覺醒了能操控重力的天賦", "目睹了禁忌的實驗過程", "解開了封印萬年的禁咒", "無意中吞下了發光的微粒", "在睡夢中交換了靈魂", "為了拯救他人而捨棄了真名", "在黑洞邊緣聽到了鐘聲", "無意中破解了鄰居的記憶磁條"],
+            res: ["從此決定隱姓埋名。", "正計畫一場壯烈的復仇。", "發誓要找回失去的身分。", "成為了都市傳說中的守護者。", "仍在尋找那道消失的極光。", "正試圖修復破碎的世界線。", "決定向當年的背叛者索命。", "目前正以平凡人的身分觀察世界。", "默默守候著那扇打不開的門。"],
+            out: ["表面優雅禮貌", "看起來脾氣暴躁", "總是帶著神祕微笑", "說話語速極快", "行為舉止非常僵硬", "對任何事都顯得漫不經心", "給人一種極強的壓迫感", "看起來非常溫柔體貼", "說話總是帶著嘲諷語氣", "平時顯得極其膽小"],
+            inn: ["內心卻極度自卑", "靈魂深處嚮往著自由", "實際上非常熱愛小動物", "內在潛藏著瘋狂的念頭", "對人性徹底感到失望", "其實是個極度依賴邏輯的人", "心裡深埋著沉重的愧疚", "擁有驚人的正義感", "其實是一個溫暖的理想主義者"],
+            det: ["總是帶著一隻壞掉的手錶。", "隨身攜帶一疊泛黃的照片。", "口袋裡裝滿了彩色玻璃珠。", "耳後有一個神祕的條碼刺青。", "堅持每天都要寫日記。", "絕對不吃任何加熱過的食物。", "習慣與肩膀上的虛擬貓咪說話。", "每當思考時就會不斷洗手。", "隨身帶著一把沒開鋒的鏽劍。", "衣服口袋裡總是塞著乾枯的玫瑰。", "雙手總是戴著厚重的黑色手套。"]
         };
 
-        const storyHistory = new Set();
-        const traitHistory = new Set();
+        let pools = {};
 
-        function generateStory() {
-            let story;
-            let attempts = 0;
-            const target = document.getElementById('story-output');
+        function init() {
+            for (let key in library) {
+                pools[key] = shuffle([...library[key]]);
+            }
+            updateStats();
+        }
 
-            do {
-                const i = data.identity[Math.floor(Math.random() * data.identity.length)];
-                const l = data.location[Math.floor(Math.random() * data.location.length)];
-                const e = data.event[Math.floor(Math.random() * data.event.length)];
-                const r = data.result[Math.floor(Math.random() * data.result.length)];
-                story = `${i}${l}${e}，${r}`;
-                attempts++;
-            } while (storyHistory.has(story) && attempts < 100);
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
-            storyHistory.add(story);
-            target.style.opacity = 0;
+        function pull(key) {
+            if (pools[key].length === 0) {
+                pools[key] = shuffle([...library[key]]);
+            }
+            return pools[key].pop();
+        }
+
+        function updateStats() {
+            const stats = document.getElementById('stats-panel');
+            const labels = { id: '身分庫', loc: '地點庫', evt: '事件庫', out: '性格庫' };
+            stats.innerHTML = '';
+            ['id', 'loc', 'evt', 'out'].forEach(key => {
+                const perc = (pools[key].length / library[key].length) * 100;
+                stats.innerHTML += `
+                    <div>
+                        <div class="flex justify-between text-[10px] mb-1 opacity-50 font-bold uppercase">
+                            <span>${labels[key]}</span>
+                            <span>${pools[key].length} / ${library[key].length}</span>
+                        </div>
+                        <div class="w-full bg-white/5 h-1 rounded-full">
+                            <div class="h-full bg-indigo-500 rounded-full transition-all duration-500" style="width: ${perc}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function generate() {
+            const targets = ['out-story', 'out-trait', 'out-detail'];
+            targets.forEach(id => document.getElementById(id).classList.remove('fade-up'));
+            
             setTimeout(() => {
-                target.innerText = story;
-                target.style.opacity = 1;
-                updateCount();
-            }, 150);
+                document.getElementById('out-story').innerText = `${pull('id')}${pull('loc')}${pull('evt')}，${pull('res')}`;
+                document.getElementById('out-trait').innerText = `${pull('out')}，${pull('inn')}。`;
+                document.getElementById('out-detail').innerText = pull('det');
+                
+                targets.forEach(id => document.getElementById(id).classList.add('fade-up'));
+                updateStats();
+            }, 50);
         }
 
-        function generateTrait() {
-            let trait;
-            let attempts = 0;
-            const target = document.getElementById('trait-output');
-
-            do {
-                trait = data.traits[Math.floor(Math.random() * data.traits.length)];
-                attempts++;
-            } while (traitHistory.has(trait) && attempts < 50);
-
-            // 如果該類別真的抽完了，清空該類別的歷史
-            if (traitHistory.size >= data.traits.length) traitHistory.clear();
-
-            traitHistory.add(trait);
-            target.style.opacity = 0;
-            setTimeout(() => {
-                target.innerText = trait;
-                target.style.opacity = 1;
-            }, 150);
+        function copyAll() {
+            const text = `【OC 設定匯出】\n背景：${document.getElementById('out-story').innerText}\n性格：${document.getElementById('out-trait').innerText}\n細節：${document.getElementById('out-detail').innerText}`;
+            navigator.clipboard.writeText(text);
+            alert("設定已存入剪貼簿！");
         }
 
-        function updateCount() {
-            document.getElementById('history-count').innerText = storyHistory.size;
-        }
+        init();
     </script>
 </body>
 </html>
