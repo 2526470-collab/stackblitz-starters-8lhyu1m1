@@ -3,201 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC 靈魂編織者</title>
+    <title>OC 靈魂編織者 Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700;900&display=swap');
-        
         body { 
             font-family: 'Noto Sans TC', sans-serif; 
             background: radial-gradient(circle at center, #1e1b4b 0%, #020617 100%);
             color: #f8fafc;
-            overflow-x: hidden;
+            min-height: 100vh;
         }
-
         .glass-card {
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
         }
-
         .accent-gradient {
             background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
-        .glow-btn {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
-        }
-
-        .glow-btn:hover {
-            box-shadow: 0 0 35px rgba(168, 85, 247, 0.6);
-            transform: translateY(-2px);
-        }
-
-        .glow-btn:active { transform: scale(0.95); }
-
-        .type-label {
-            font-size: 0.7rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            padding: 2px 8px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        /* 內容出現動畫 */
-        .fade-up {
-            animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
-            to { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
+        .fade-up { animation: fadeUp 0.6s ease-out forwards; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="py-12 px-4">
 
-    <div class="fixed top-0 left-0 w-full h-full pointer-events-none">
-        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-900/20 blur-[120px] rounded-full"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-900/20 blur-[120px] rounded-full"></div>
-    </div>
-
-    <div class="max-w-4xl w-full z-10">
-        <header class="text-center mb-12">
-            <h1 class="text-5xl font-black mb-4 accent-gradient tracking-tighter">OC 背景生成器</h1>
-            <p class="text-slate-400 font-light tracking-[0.3em] text-sm">ORIGINAL CHARACTER GENERATOR</p>
+    <div class="max-w-4xl mx-auto space-y-8">
+        <header class="text-center">
+            <h1 class="text-5xl font-black mb-2 accent-gradient tracking-tighter">OC 角色設定庫</h1>
+            <p class="text-slate-500 font-light tracking-[0.2em] text-xs uppercase">Procedural Attribute Mapping</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <div class="lg:col-span-1 space-y-6">
-                <div class="glass-card rounded-3xl p-6">
-                    <h3 class="text-xs font-bold text-slate-500 mb-4 tracking-widest uppercase">系統狀態</h3>
-                    <div class="space-y-4" id="stats-panel">
-                        </div>
-                </div>
-
-                <button onclick="generate()" class="glow-btn w-full py-6 rounded-2xl text-white font-bold text-xl flex items-center justify-center gap-3 group">
-                    <span>✨ 抽取靈魂</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                </button>
-            </div>
-
-            <div class="lg:col-span-2 space-y-6">
-                <div class="glass-card rounded-[2rem] p-10 relative overflow-hidden group">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
-                    <span class="type-label">背景故事 / Background</span>
-                    <p id="out-story" class="text-2xl mt-6 leading-relaxed text-slate-100 font-light italic">
-                        點擊左側按鈕開始生成...
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-card rounded-[2rem] p-8">
-                        <span class="type-label text-emerald-400/60">性格特質 / Personality</span>
-                        <p id="out-trait" class="mt-4 text-slate-300 leading-relaxed">-</p>
-                    </div>
-                    <div class="glass-card rounded-[2rem] p-8">
-                        <span class="type-label text-amber-400/60">獨特細節 / Quirks</span>
-                        <p id="out-detail" class="mt-4 text-slate-300 leading-relaxed">-</p>
-                    </div>
-                </div>
-            </div>
-
+        <div class="glass-card rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-30"></div>
+            <span class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">背景故事 / Background</span>
+            <p id="out-story" class="text-3xl mt-6 leading-relaxed italic text-slate-100 font-light fade-up">載入中...</p>
         </div>
 
-        <footer class="mt-12 text-center">
-            <button onclick="copyAll()" class="text-slate-500 hover:text-indigo-400 transition text-xs border-b border-transparent hover:border-indigo-400 pb-1">
-                COPY SETTINGS TO CLIPBOARD
-            </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass-card rounded-[2rem] p-8">
+                <span class="text-[10px] text-emerald-400/70 font-bold uppercase tracking-widest">性格 / Personality</span>
+                <p id="out-trait" class="mt-4 text-slate-300 text-lg leading-relaxed">-</p>
+            </div>
+            <div class="glass-card rounded-[2rem] p-8">
+                <span class="text-[10px] text-amber-400/70 font-bold uppercase tracking-widest">特徵 / Details</span>
+                <p id="out-detail" class="mt-4 text-slate-300 text-lg leading-relaxed">-</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center pt-8 border-t border-white/5">
+            <div class="lg:col-span-2 flex flex-col items-center">
+                <div class="w-full max-w-[280px] aspect-square relative">
+                    <canvas id="abilityChart"></canvas>
+                </div>
+                <p class="mt-4 text-[10px] text-slate-500 uppercase tracking-widest font-bold">能力分布圖</p>
+            </div>
+            
+            <div class="lg:col-span-3 space-y-4">
+                <button onclick="generate()" class="w-full py-6 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-2xl shadow-xl shadow-indigo-500/20 transition-all active:scale-95 group">
+                    <span class="group-hover:tracking-widest transition-all">✨ 重新編織靈魂</span>
+                </button>
+                <button onclick="copyAll()" class="w-full py-3 text-slate-500 hover:text-slate-300 text-xs tracking-widest uppercase transition">
+                    📋 複製完整設定
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
         const library = {
-            id: ["一名失憶的星際老兵", "廢棄工廠的仿生少女", "被驅逐的宮廷占星師", "深海探險隊的倖存者", "擁有讀心能力的調酒師", "最後的古文獻翻譯員", "穿梭時空的信差", "地下競技場的常勝軍", "沒落皇室的私生子", "非法改造的偵探", "在圖書館長大的孤兒", "非法基因實驗的逃亡者", "一名行蹤成謎的僧侶", "古老機械的守護員", "街頭的賽博黑客", "神祕的古董商人", "受詛咒的流浪騎士", "在霓虹燈下起舞的殺手", "星際植物學家", "幻影歌劇院的樂師", "一名流浪的舊時代軍醫", "被遺忘在月球的工程師"],
-            loc: ["在漂浮的垃圾城", "在發光植物的洞穴", "在霓虹覆蓋的罪惡街區", "在被遺忘的神殿廢墟", "在極地的移動監獄", "在充滿魔力的圖書館", "在永恆黃昏的荒漠", "在雲端的行政區", "在海底的私人試驗站", "在齒輪運轉的地下城", "在廢棄的宇宙廣播站", "在滿是鐵鏽的工業區", "在時間靜止的鐘樓"],
-            evt: ["意外發現了世界的系統後門", "被最親近的人抹除了存在證明", "拾獲了能與過去對話的硬幣", "被迫成為神明降臨的載體", "覺醒了能操控重力的天賦", "目睹了禁忌的實驗過程", "解開了封印萬年的禁咒", "無意中吞下了發光的微粒", "在睡夢中交換了靈魂", "為了拯救他人而捨棄了真名", "在黑洞邊緣聽到了鐘聲", "無意中破解了鄰居的記憶磁條"],
-            res: ["從此決定隱姓埋名。", "正計畫一場壯烈的復仇。", "發誓要找回失去的身分。", "成為了都市傳說中的守護者。", "仍在尋找那道消失的極光。", "正試圖修復破碎的世界線。", "決定向當年的背叛者索命。", "目前正以平凡人的身分觀察世界。", "默默守候著那扇打不開的門。"],
-            out: ["表面優雅禮貌", "看起來脾氣暴躁", "總是帶著神祕微笑", "說話語速極快", "行為舉止非常僵硬", "對任何事都顯得漫不經心", "給人一種極強的壓迫感", "看起來非常溫柔體貼", "說話總是帶著嘲諷語氣", "平時顯得極其膽小"],
-            inn: ["內心卻極度自卑", "靈魂深處嚮往著自由", "實際上非常熱愛小動物", "內在潛藏著瘋狂的念頭", "對人性徹底感到失望", "其實是個極度依賴邏輯的人", "心裡深埋著沉重的愧疚", "擁有驚人的正義感", "其實是一個溫暖的理想主義者"],
-            det: ["總是帶著一隻壞掉的手錶。", "隨身攜帶一疊泛黃的照片。", "口袋裡裝滿了彩色玻璃珠。", "耳後有一個神祕的條碼刺青。", "堅持每天都要寫日記。", "絕對不吃任何加熱過的食物。", "習慣與肩膀上的虛擬貓咪說話。", "每當思考時就會不斷洗手。", "隨身帶著一把沒開鋒的鏽劍。", "衣服口袋裡總是塞著乾枯的玫瑰。", "雙手總是戴著厚重的黑色手套。"]
+            id: ["退役的星際傭兵", "仿生少女", "被驅逐的占星師", "深海倖存者", "讀心調酒師", "古文獻翻譯員", "時空信差", "龍裔領主", "賽博黑客", "古董商人", "流浪軍醫", "機械守護者"],
+            loc: ["在垃圾城", "在發光洞穴", "在霓虹街區", "在神殿廢墟", "在移動監獄", "在雲端行政區", "在時間靜止的圖書館"],
+            evt: ["發現系統後門", "被抹除存在證明", "拾獲對話硬幣", "成為神明載體", "覺醒重力天賦", "目睹禁忌實驗", "解開萬年禁咒"],
+            res: ["決定隱姓埋名。", "計畫壯烈復仇。", "發誓找回身分。", "成為都市傳說。", "尋找消失極光。", "正修補世界線。"],
+            out: ["表面優雅禮貌", "看起來脾氣暴躁", "帶著神祕微笑", "說話語速極快", "行為舉止僵硬", "顯得漫不經心"],
+            inn: ["內心卻極度自卑", "靈魂嚮往自由", "熱愛小動物", "潛藏瘋狂念頭", "對人性徹底失望", "其實極度理性"],
+            det: ["帶著壞掉的手錶。", "攜帶泛黃的照片。", "口袋裝滿玻璃珠。", "耳後有條碼刺青。", "堅持每天寫日記。", "隨身帶著乾枯的玫瑰。"]
         };
 
         let pools = {};
+        let myChart;
 
-        function init() {
-            for (let key in library) {
-                pools[key] = shuffle([...library[key]]);
-            }
-            updateStats();
-        }
-
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
+        function initChart() {
+            const ctx = document.getElementById('abilityChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['力量', '敏捷', '智力', '體質', '意志', '幸運'],
+                    datasets: [{
+                        data: [0, 0, 0, 0, 0, 0],
+                        fill: true,
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        borderColor: 'rgb(129, 140, 248)',
+                        pointBackgroundColor: 'rgb(129, 140, 248)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            min: 0, max: 100,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: 'rgba(255, 255, 255, 0.4)', font: { size: 11 } },
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
         }
 
         function pull(key) {
-            if (pools[key].length === 0) {
-                pools[key] = shuffle([...library[key]]);
+            if (!pools[key] || pools[key].length === 0) {
+                pools[key] = [...library[key]].sort(() => Math.random() - 0.5);
             }
             return pools[key].pop();
         }
 
-        function updateStats() {
-            const stats = document.getElementById('stats-panel');
-            const labels = { id: '身分庫', loc: '地點庫', evt: '事件庫', out: '性格庫' };
-            stats.innerHTML = '';
-            ['id', 'loc', 'evt', 'out'].forEach(key => {
-                const perc = (pools[key].length / library[key].length) * 100;
-                stats.innerHTML += `
-                    <div>
-                        <div class="flex justify-between text-[10px] mb-1 opacity-50 font-bold uppercase">
-                            <span>${labels[key]}</span>
-                            <span>${pools[key].length} / ${library[key].length}</span>
-                        </div>
-                        <div class="w-full bg-white/5 h-1 rounded-full">
-                            <div class="h-full bg-indigo-500 rounded-full transition-all duration-500" style="width: ${perc}%"></div>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
         function generate() {
-            const targets = ['out-story', 'out-trait', 'out-detail'];
-            targets.forEach(id => document.getElementById(id).classList.remove('fade-up'));
-            
-            setTimeout(() => {
-                document.getElementById('out-story').innerText = `${pull('id')}${pull('loc')}${pull('evt')}，${pull('res')}`;
-                document.getElementById('out-trait').innerText = `${pull('out')}，${pull('inn')}。`;
-                document.getElementById('out-detail').innerText = pull('det');
-                
-                targets.forEach(id => document.getElementById(id).classList.add('fade-up'));
-                updateStats();
-            }, 50);
+            const story = `一名${pull('id')}${pull('loc')}${pull('evt')}，${pull('res')}`;
+            const trait = `${pull('out')}，${pull('inn')}。`;
+            const detail = pull('det');
+
+            const storyEl = document.getElementById('out-story');
+            storyEl.innerText = story;
+            document.getElementById('out-trait').innerText = trait;
+            document.getElementById('out-detail').innerText = detail;
+
+            // 數值
+            myChart.data.datasets[0].data = Array.from({length: 6}, () => Math.floor(Math.random() * 60) + 40);
+            myChart.update();
+
+            // 重啟動畫
+            storyEl.classList.remove('fade-up');
+            void storyEl.offsetWidth; 
+            storyEl.classList.add('fade-up');
         }
 
         function copyAll() {
             const text = `【OC 設定匯出】\n背景：${document.getElementById('out-story').innerText}\n性格：${document.getElementById('out-trait').innerText}\n細節：${document.getElementById('out-detail').innerText}`;
             navigator.clipboard.writeText(text);
-            alert("設定已存入剪貼簿！");
+            alert("已複製到剪貼簿！");
         }
 
-        init();
+        window.onload = () => {
+            initChart();
+            generate();
+        };
     </script>
 </body>
 </html>
