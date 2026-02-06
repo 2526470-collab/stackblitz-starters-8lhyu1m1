@@ -1,114 +1,133 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OC 背景故事生成器</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OC 背景 & 性格生成器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
-      body {
-        font-family: 'Noto Sans TC', sans-serif;
-      }
-      .result-card {
-        transition: all 0.3s ease;
-      }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background: #0f172a; color: #f1f5f9; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .output-box { min-height: 120px; transition: all 0.3s ease; }
     </style>
-  </head>
-  <body class="bg-slate-50 min-h-screen flex flex-col items-center py-12 px-4">
-    <div
-      class="max-w-2xl w-full bg-white rounded-2xl shadow-xl overflow-hidden"
-    >
-      <div class="bg-indigo-600 p-6 text-white text-center">
-        <h1 class="text-3xl font-bold tracking-tight">OC 背景生成器</h1>
-        <p class="mt-2 opacity-80">為你的原創角色注入靈魂與故事</p>
-      </div>
+</head>
+<body class="min-h-screen py-10 px-4 flex flex-col items-center">
 
-      <div class="p-8">
-        <div id="display-area" class="hidden">
-          <div
-            class="result-card bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-lg mb-8"
-          >
-            <h2 class="text-indigo-900 font-bold mb-4 flex items-center">
-              <span class="mr-2">📜</span> 生成結果：
-            </h2>
-            <p id="story-text" class="text-slate-700 leading-loose text-lg"></p>
-          </div>
+    <div class="max-w-2xl w-full">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 mb-2">
+                OC 設定生成器
+            </h1>
+            <p class="text-slate-400">創造獨一無二的人物靈魂</p>
+        </header>
+
+        <div class="space-y-4">
+            <div class="glass rounded-2xl p-6 shadow-xl">
+                <h3 class="text-blue-400 text-sm font-bold mb-2 flex items-center">
+                    <span class="mr-2">📖</span> 背景故事
+                </h3>
+                <div id="story-output" class="output-box flex items-center text-lg leading-relaxed italic text-slate-200">
+                    等待召喚背景...
+                </div>
+            </div>
+
+            <div class="glass rounded-2xl p-6 shadow-xl">
+                <h3 class="text-purple-400 text-sm font-bold mb-2 flex items-center">
+                    <span class="mr-2">🎭</span> 性格特質
+                </h3>
+                <div id="trait-output" class="output-box flex items-center text-lg leading-relaxed font-medium text-slate-200">
+                    等待解析性格...
+                </div>
+            </div>
         </div>
 
-        <div id="placeholder" class="text-center py-12 text-slate-400">
-          <p>點擊下方按鈕，隨機生成一個背景設定</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+            <button onclick="generateStory()" class="bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold shadow-lg shadow-blue-900/30 transition-all active:scale-95">
+                ✨ 生成背景
+            </button>
+            <button onclick="generateTrait()" class="bg-purple-600 hover:bg-purple-500 py-4 rounded-xl font-bold shadow-lg shadow-purple-900/30 transition-all active:scale-95">
+                💎 生成性格
+            </button>
         </div>
 
-        <button
-          onclick="generateStory()"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition duration-200 transform hover:-translate-y-1 active:scale-95"
-        >
-          ✨ 隨機生成背景
-        </button>
-      </div>
-
-      <div class="px-8 pb-8">
-        <div class="grid grid-cols-2 gap-4 text-sm text-slate-500">
-          <div class="bg-slate-100 p-3 rounded">💡 包含：出生背景</div>
-          <div class="bg-slate-100 p-3 rounded">🔑 包含：核心動機</div>
-          <div class="bg-slate-100 p-3 rounded">⚔️ 包含：重大的轉折</div>
-          <div class="bg-slate-100 p-3 rounded">🌟 包含：目前的處境</div>
+        <div class="mt-10 text-center text-xs text-slate-500 space-y-1">
+            <p>已生成組合：<span id="history-count" class="text-slate-300">0</span></p>
+            <p>※ 系統會自動過濾重複內容，確保靈感不枯竭</p>
         </div>
-      </div>
     </div>
 
     <script>
-      const data = {
-        origin: [
-          '出生在一個被遺忘的邊境小鎮，',
-          '曾是沒落貴族家的唯一後裔，',
-          '在喧鬧的地下都市貧民窟長大，',
-          '原本是隸屬於神秘組織的實驗體，',
-          '生長於深山的守護者一族，',
-          '是在圖書館廢墟中被機器人撫養長大的孩子，',
-        ],
-        turningPoint: [
-          '但在一次意外的森林大火中失去了一切，',
-          '卻因為發現了家族隱藏的禁忌秘密而被驅逐，',
-          '直到那名戴著面具的陌生人給了其一份契約，',
-          '某天突然覺醒了連自己都無法掌控的力量，',
-          '為了尋找失蹤多年的親人而踏上旅程，',
-          '因被最好的朋友背叛而落入絕境，',
-        ],
-        motivation: [
-          '現在隱姓埋名，秘密地尋找復仇的機會。',
-          '此後決定成為一名遊走於灰色地帶的情報販子。',
-          '目前正帶著那件詛咒的遺物，尋找解除的方法。',
-          '決心變強，直到能夠守護身邊僅剩的人事物。',
-          '雖然失去了記憶，但本能地朝著地圖上的紅點前行。',
-          '在世界各地旅行，只為證明那個傳說並非虛構。',
-        ],
-      };
+        const data = {
+            // 背景零件
+            identity: ["一名軍醫", "一位廢土拾荒者", "退役的聖騎士", "皇室的私生子", "叛逃的AI原型", "街頭的神祕占卜師", "被放逐的龍族血脈"],
+            location: ["在浮空監獄裡", "在古老的機械迷宮中", "在永恆的黑夜森林", "在沉沒的古城遺址", "在繁華卻腐敗的首都", "在邊境的無人區"],
+            event: ["目睹了禁忌的禁咒運作", "意外獲得了操控時間的能力", "發現了自己其實是個複製品", "被家族作為政治交易犧牲", "在絕境中聽見了古神的低語"],
+            result: ["從此不再信任任何人。", "正秘密組織著反抗力量。", "決定踏上贖罪的漫長旅程。", "發誓要奪回失去的王位。", "目前以此作為力量的源泉。"],
+            
+            // 性格零件
+            traits: [
+                "表面冷酷無情，其實對小動物毫無抵抗力。",
+                "極度理性，認為情感是干擾判斷的雜訊。",
+                "總是帶著溫柔的微笑，眼神卻沒有絲毫溫度。",
+                "重度強迫症，必須確保計畫完美無缺才行動。",
+                "說話充滿諷刺，但會在關鍵時刻捨身救人。",
+                "充滿好奇心，即使面對危險也想探究真相。",
+                "極其自卑，因此總是表現得過度狂妄自大。",
+                "雖然健忘，但對於承諾過的事絕對會完成。"
+            ]
+        };
 
-      function generateStory() {
-        const displayArea = document.getElementById('display-area');
-        const placeholder = document.getElementById('placeholder');
-        const storyText = document.getElementById('story-text');
+        const storyHistory = new Set();
+        const traitHistory = new Set();
 
-        const o = data.origin[Math.floor(Math.random() * data.origin.length)];
-        const t =
-          data.turningPoint[
-            Math.floor(Math.random() * data.turningPoint.length)
-          ];
-        const m =
-          data.motivation[Math.floor(Math.random() * data.motivation.length)];
+        function generateStory() {
+            let story;
+            let attempts = 0;
+            const target = document.getElementById('story-output');
 
-        // Animation effect
-        storyText.style.opacity = 0;
+            do {
+                const i = data.identity[Math.floor(Math.random() * data.identity.length)];
+                const l = data.location[Math.floor(Math.random() * data.location.length)];
+                const e = data.event[Math.floor(Math.random() * data.event.length)];
+                const r = data.result[Math.floor(Math.random() * data.result.length)];
+                story = `${i}${l}${e}，${r}`;
+                attempts++;
+            } while (storyHistory.has(story) && attempts < 100);
 
-        setTimeout(() => {
-          storyText.innerText = o + t + m;
-          storyText.style.opacity = 1;
-          displayArea.classList.remove('hidden');
-          placeholder.classList.add('hidden');
-        }, 100);
-      }
+            storyHistory.add(story);
+            target.style.opacity = 0;
+            setTimeout(() => {
+                target.innerText = story;
+                target.style.opacity = 1;
+                updateCount();
+            }, 150);
+        }
+
+        function generateTrait() {
+            let trait;
+            let attempts = 0;
+            const target = document.getElementById('trait-output');
+
+            do {
+                trait = data.traits[Math.floor(Math.random() * data.traits.length)];
+                attempts++;
+            } while (traitHistory.has(trait) && attempts < 50);
+
+            // 如果該類別真的抽完了，清空該類別的歷史
+            if (traitHistory.size >= data.traits.length) traitHistory.clear();
+
+            traitHistory.add(trait);
+            target.style.opacity = 0;
+            setTimeout(() => {
+                target.innerText = trait;
+                target.style.opacity = 1;
+            }, 150);
+        }
+
+        function updateCount() {
+            document.getElementById('history-count').innerText = storyHistory.size;
+        }
     </script>
-  </body>
+</body>
 </html>
