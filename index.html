@@ -3,168 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC 靈魂編織者 - 跨時空版</title>
+    <title>OC Soul Weaver - Ultimate Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;400;700;900&family=Orbitron:wght@400;900&display=swap');
+        
         body { 
             font-family: 'Noto Sans TC', sans-serif; 
-            background: radial-gradient(circle at center, #1a1a2e 0%, #050505 100%);
-            color: #f8fafc;
-            min-height: 100vh;
+            background: #050505;
+            color: #e2e8f0;
+            overflow-x: hidden;
         }
-        .glass-card {
-            background: rgba(20, 20, 25, 0.7);
-            backdrop-filter: blur(15px);
+
+        /* 核心匯出區域樣式 */
+        #export-area {
+            position: relative;
+            background: linear-gradient(145deg, #0f172a 0%, #020617 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+
+        /* 背景裝飾 */
+        .bg-glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
         }
-        .accent-gradient {
-            background: linear-gradient(135deg, #fb7185 0%, #a855f7 50%, #6366f1 100%);
+
+        .neo-title {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(90deg, #818cf8, #fb7185);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            letter-spacing: 0.2em;
         }
-        .fade-up { animation: fadeUp 0.6s ease-out forwards; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .stat-label { font-family: 'Orbitron', sans-serif; font-size: 10px; color: #64748b; }
+
+        /* 按鈕視覺 */
+        .btn-gen {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-gen:hover { transform: scale(1.02); box-shadow: 0 0 25px rgba(99, 102, 241, 0.6); }
+
+        .btn-img {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        .btn-img:hover { background: rgba(255, 255, 255, 0.1); border-color: #fb7185; }
+
+        .fade-in { animation: fadeIn 0.8s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; filter: blur(10px); } to { opacity: 1; filter: blur(0); } }
     </style>
 </head>
-<body class="py-12 px-4">
+<body class="py-12 px-4 flex flex-col items-center">
 
-    <div class="max-w-4xl mx-auto space-y-8">
-        <header class="text-center">
-            <h1 class="text-5xl font-black mb-2 accent-gradient tracking-tighter">OC 角色設定庫</h1>
-            <p class="text-slate-500 font-light tracking-[0.2em] text-xs uppercase">Magical / Cultivator / Survivor Expansion</p>
-        </header>
+    <div class="max-w-4xl w-full">
+        <div id="export-area" class="rounded-[3rem] p-12 shadow-2xl">
+            <div class="bg-glow top-[-10%] left-[-10%]"></div>
+            <div class="bg-glow bottom-[-10%] right-[-10%]" style="background: radial-gradient(circle, rgba(251, 113, 133, 0.1) 0%, transparent 70%);"></div>
 
-        <div class="glass-card rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500 opacity-40"></div>
-            <span class="text-[10px] text-slate-500 font-bold tracking-widest uppercase italic">角色核心檔案 / Core Profile</span>
-            <p id="out-story" class="text-2xl mt-6 leading-relaxed italic text-slate-100 font-light fade-up">按下抽取，召喚靈魂...</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="glass-card rounded-[2rem] p-8 border-t border-purple-500/20">
-                <span class="text-[10px] text-purple-400 font-bold uppercase tracking-widest">性格特徵 / Personality</span>
-                <p id="out-trait" class="mt-4 text-slate-300 text-lg leading-relaxed">-</p>
-            </div>
-            <div class="glass-card rounded-[2rem] p-8 border-t border-rose-500/20">
-                <span class="text-[10px] text-rose-400 font-bold uppercase tracking-widest">特殊印記 / Unique Detail</span>
-                <p id="out-detail" class="mt-4 text-slate-300 text-lg leading-relaxed">-</p>
-            </div>
-        </div>
-
-        <div class="glass-card rounded-[2.5rem] p-8 grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
-            <div class="lg:col-span-2 flex flex-col items-center">
-                <div class="w-full max-w-[280px] aspect-square">
-                    <canvas id="abilityChart"></canvas>
+            <div class="relative z-10 flex justify-between items-start mb-12">
+                <div class="text-left">
+                    <h2 class="neo-title text-sm font-black">SOUL WEAVER</h2>
+                    <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-[0.3em]">Confidential Profile</p>
+                </div>
+                <div class="text-right">
+                    <div id="card-id" class="stat-label">UID: #882-990-2026</div>
+                    <div id="card-date" class="stat-label mt-1">2026-02-10</div>
                 </div>
             </div>
-            
-            <div class="lg:col-span-3 space-y-4">
-                <button onclick="generate()" class="w-full py-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-2xl shadow-xl shadow-purple-500/20 transition-all active:scale-95">
-                    ✨ 重新編織靈魂
-                </button>
-                <div class="flex gap-4">
-                    <button onclick="copyAll()" class="flex-1 py-3 glass-card rounded-xl text-slate-400 hover:text-white text-xs tracking-widest uppercase transition">
-                        📋 複製設定
-                    </button>
-                    <div id="pool-count" class="text-[10px] text-slate-600 flex items-center px-2">零件充足</div>
+
+            <div class="relative z-10 mb-10">
+                <div class="glass-panel rounded-3xl p-8 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                    <h3 class="text-[10px] font-black text-indigo-400/80 mb-4 tracking-widest">BACKGROUND STORY</h3>
+                    <p id="out-story" class="text-3xl leading-snug italic text-white font-light tracking-tight fade-in">
+                        等待召喚...
+                    </p>
                 </div>
             </div>
+
+            <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                <div class="space-y-6">
+                    <div class="glass-panel rounded-2xl p-6">
+                        <h4 class="text-[10px] font-black text-rose-400 mb-3 tracking-widest">PERSONALITY</h4>
+                        <p id="out-trait" class="text-slate-300 leading-relaxed font-light text-lg">-</p>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-6">
+                        <h4 class="text-[10px] font-black text-emerald-400 mb-3 tracking-widest">UNIQUE MARK</h4>
+                        <p id="out-detail" class="text-slate-300 leading-relaxed font-light text-lg">-</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <div class="w-full max-w-[280px] p-4">
+                        <canvas id="abilityChart"></canvas>
+                    </div>
+                    <div class="mt-4 flex gap-8">
+                        <div class="text-center"><p class="text-[10px] text-slate-500 uppercase">Class</p><p id="type-tag" class="text-sm font-bold text-indigo-400">-</p></div>
+                        <div class="text-center"><p class="text-[10px] text-slate-500 uppercase">Rank</p><p id="rank-tag" class="text-sm font-bold text-rose-400">-</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+            <button onclick="generate()" class="sm:col-span-2 py-6 rounded-3xl btn-gen text-white font-black text-2xl flex items-center justify-center gap-4">
+                <span>🎲 重新編織靈魂</span>
+            </button>
+            <button onclick="exportImage()" class="py-6 rounded-3xl btn-img text-slate-200 font-bold text-xl flex flex-col items-center justify-center">
+                <span class="text-xs text-slate-500 mb-1">SAVE AS IMAGE</span>
+                📸 下載角色卡
+            </button>
         </div>
     </div>
 
     <script>
         const library = {
-            id: [
-                // 魔法少女類
-                "簽下錯誤契約的魔法少女", "被噩夢侵蝕的魔法使", "失去變身道具的見習少女", "隱藏在校園中的魔女獵人",
-                // 修仙類
-                "丹田破碎的廢柴少主", "修煉禁忌功法的魔道散修", "天生劍體的落魄劍修", "守護藥園的靈獸化身",
-                // 末日類
-                "廢土中的避難所遺孤", "擁有預知能力的拾荒者", "受感染但仍保持理智的變異者", "末日廣播站的唯一播報員",
-                // 原有類
-                "失憶的星際傭兵", "仿生機器人", "被逐出的占星師", "讀心調酒師", "最後的古文獻翻譯員"
-            ],
-            loc: [
-                "在被詛咒的糖果工廠", "在雷雲密佈的渡劫台", "在滿是異種的斷裂大橋下", "在星光凋零的魔法陣中心",
-                "在充滿靈氣卻致命的禁地", "在霓虹覆蓋的罪惡街區", "在時間靜止的圖書館", "在廢棄的核電廠核心"
-            ],
-            evt: [
-                "發現了變身後會消耗壽命的真相", "強行衝擊境界導致神魂受損", "意外開啟了通往平行宇宙的信箱",
-                "目睹了魔法契約背後的巨大謊言", "在輻射塵中找到了一朵活著的花", "在遺蹟中拾獲了仙帝的殘破日記",
-                "被最信任的契約獸出賣了身分", "破解了古老文明留下的自毀代碼"
-            ],
-            res: [
-                "決定燃燒最後的靈魂光芒。", "誓言要逆天改命重新開始。", "正隱瞞傷勢獨自對抗荒原生物。",
-                "成為了黑暗中默默前行的守護者。", "正等待著下一個能契約的靈魂。", "在廢墟中建立了微小的秩序。"
-            ],
-            out: [
-                "雖然看起來天真爛漫", "平時表現得極度自負", "神情透著一種死寂般的冷靜", "舉止充滿了仙風道骨的韻味",
-                "行為處事極端現實且冷酷", "說話總帶著神祕的術語", "看起來總是傷痕累累"
-            ],
-            inn: ["內心卻極度渴望平凡的生活", "靈魂早已被黑暗魔力侵蝕", "其實對正義感到無比疲憊", "潛意識中極度害怕孤獨", "對這個崩壞的世界仍抱有溫柔", "實則隱藏著不可告人的慈悲"],
-            det: [
-                "手腕上繫著斷掉的變身帶。", "左眼瞳孔中隱約有雷光閃動。", "隨身攜帶一根生鏽的撬棍。", "耳後刻著無法抹去的實驗編號。",
-                "口袋裡裝著一顆早已乾枯的靈石。", "腰間掛著一個碎裂的陶瓷玩偶。", "總是聞到一股燃燒的香灰味。", "身上披著一件不合身的染血校服。"
-            ]
+            id: ["簽下契約的魔法少女", "丹田破碎的廢柴少主", "避難所拾荒者", "失憶的星際傭兵", "被侵蝕的魔女", "落魄劍修", "變異生存者", "時間靜止的圖書館長", "尋找心臟的機器人"],
+            loc: ["在糖果工廠", "在渡劫台", "在斷裂大橋下", "在禁地核心", "在霓虹街區", "在宇宙廣播站", "在永恆黃昏的荒野"],
+            evt: ["發現契約真相", "神魂受損", "找到活著的花", "目睹巨大謊言", "破解自毀代碼", "拾獲仙帝日記", "聽見了黑洞的哭聲"],
+            res: ["決定燃燒最後的魂火。", "誓言逆天改命。", "尋求微小的希望。", "成為暗處的守護者。", "正獨自對抗荒原。", "從此不再與人交談。"],
+            out: ["看起來天真爛漫", "神情冷靜如死寂", "處事現實冷酷", "行為充滿仙氣", "表現得極度自負", "給人一種極強的疏離感"],
+            inn: ["渴望平凡生活", "靈魂已被侵蝕", "對世界抱有溫柔", "隱藏著秘密慈悲", "對正義感到疲憊", "實則深藏不露"],
+            det: ["手腕繫著斷掉的變身帶。", "左眼閃動隱約雷光。", "隨身帶著生鏽撬棍。", "腰間掛著碎裂玩偶。", "聞到燃燒的香灰味。", "指尖纏繞著無法解開的紅線。"]
         };
 
-        let pools = {};
         let myChart;
-
         function initChart() {
             const ctx = document.getElementById('abilityChart').getContext('2d');
             myChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: ['戰鬥', '生存', '悟性', '魔力', '意志', '幸運'],
+                    labels: ['ATK', 'SUR', 'INT', 'MAG', 'WIL', 'LUK'],
                     datasets: [{
-                        data: [0, 0, 0, 0, 0, 0],
+                        data: [0,0,0,0,0,0],
                         fill: true,
-                        backgroundColor: 'rgba(168, 85, 247, 0.2)',
-                        borderColor: 'rgb(168, 85, 247)',
-                        pointBackgroundColor: 'rgb(251, 113, 133)',
-                        borderWidth: 2
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        borderColor: 'rgb(129, 140, 248)',
+                        pointRadius: 0,
+                        borderWidth: 1.5
                     }]
                 },
                 options: {
-                    scales: { r: { min: 0, max: 100, grid: { color: 'rgba(255, 255, 255, 0.05)' }, angleLines: { color: 'rgba(255, 255, 255, 0.1)' }, pointLabels: { color: 'rgba(255, 255, 255, 0.4)', font: { size: 11 } }, ticks: { display: false } } },
+                    scales: { r: { min: 0, max: 100, grid: { color: 'rgba(255, 255, 255, 0.05)' }, angleLines: { color: 'rgba(255, 255, 255, 0.1)' }, pointLabels: { color: '#475569', font: { family: 'Orbitron', size: 9 } }, ticks: { display: false } } },
                     plugins: { legend: { display: false } }
                 }
             });
         }
 
-        function pull(key) {
-            if (!pools[key] || pools[key].length === 0) {
-                pools[key] = [...library[key]].sort(() => Math.random() - 0.5);
-            }
-            return pools[key].pop();
-        }
-
         function generate() {
-            const story = `一名${pull('id')}${pull('loc')}${pull('evt')}，${pull('res')}`;
-            const trait = `${pull('out')}，${pull('inn')}。`;
-            const detail = pull('det');
-
-            const storyEl = document.getElementById('out-story');
-            storyEl.innerText = story;
-            document.getElementById('out-trait').innerText = trait;
-            document.getElementById('out-detail').innerText = detail;
-
-            // 隨機數值 (10-100)，支持弱角色與強者
-            myChart.data.datasets[0].data = Array.from({length: 6}, () => Math.floor(Math.random() * 90) + 10);
+            const pull = (k) => library[k][Math.floor(Math.random() * library[k].length)];
+            
+            document.getElementById('out-story').innerText = `一名${pull('id')}${pull('loc')}${pull('evt')}，${pull('res')}`;
+            document.getElementById('out-trait').innerText = `${pull('out')}，${pull('inn')}。`;
+            document.getElementById('out-detail').innerText = pull('det');
+            
+            // 隨機數值與評價
+            const stats = Array.from({length: 6}, () => Math.floor(Math.random() * 85) + 15);
+            myChart.data.datasets[0].data = stats;
             myChart.update();
 
-            storyEl.classList.remove('fade-up');
-            void storyEl.offsetWidth; 
-            storyEl.classList.add('fade-up');
+            const avg = stats.reduce((a, b) => a + b) / 6;
+            const ranks = ["F", "E", "D", "C", "B", "A", "S"];
+            document.getElementById('rank-tag').innerText = ranks[Math.floor(avg/15)];
+            document.getElementById('type-tag').innerText = ["NORMAL", "MYSTIC", "VOID", "ANCIENT"][Math.floor(Math.random()*4)];
+            document.getElementById('card-id').innerText = `UID: #${Math.floor(Math.random()*999)}-${Math.floor(Math.random()*999)}-2026`;
+            
+            const el = document.getElementById('out-story');
+            el.classList.remove('fade-in');
+            void el.offsetWidth;
+            el.classList.add('fade-in');
         }
 
-        function copyAll() {
-            const text = `【OC 設定匯出】\n背景：${document.getElementById('out-story').innerText}\n性格：${document.getElementById('out-trait').innerText}\n特徵：${document.getElementById('out-detail').innerText}`;
-            navigator.clipboard.writeText(text);
-            alert("已複製到剪貼簿！");
+        async function exportImage() {
+            const area = document.getElementById('export-area');
+            const canvas = await html2canvas(area, { backgroundColor: "#050505", scale: 2 });
+            const link = document.createElement('a');
+            link.download = `SoulWeaver_${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
         }
 
         window.onload = () => { initChart(); generate(); };
